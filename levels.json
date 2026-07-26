@@ -15,11 +15,6 @@
         "user": "Test",
         "percent": 100,
         "video": "https://youtube.com"
-      },
-      {
-        "user": test",
-        "percent": 100,
-        "video": "https://youtube.com"
       }
     ]
 
