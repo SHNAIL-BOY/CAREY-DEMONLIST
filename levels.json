@@ -9,12 +9,10 @@
       {
         "user": "Jimmy",
         "percent": 100,
-        "video": "https://youtube.com"
       },
       {
         "user": "Test",
         "percent": 100,
-        "video": "https://youtube.com"
       }
     ]
   }
