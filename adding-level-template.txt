@@ -1,0 +1,21 @@
+level:
+
+[
+  {
+    "name": "Bloodbath",
+    "publisher": "Riot",
+    "verifier": "Riot",
+    "levelID": "10565740",
+    "video": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "records": []
+  }
+]
+
+add records:
+"records": [
+     {
+        "user": "SHNAILBOY",
+        "percent": 100,
+        "video": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+      }
+    ]
