@@ -1,17 +1,13 @@
 [
   {
-    "name": "Test",
-    "publisher": "SHNAIL",
-    "verifier": "SHNAIL",
-    "levelID": "84323130",
+    "name": "Sonic Wave",
+    "publisher": "Cyclic",
+    "verifier": "Sunix",
+    "levelID": "116942100",
     "video": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
     "records": [
       {
-        "user": "Jimmy",
-        "percent": 100,
-      },
-      {
-        "user": "Test",
+        "user": "SHNAILBOY",
         "percent": 100,
       }
     ]
