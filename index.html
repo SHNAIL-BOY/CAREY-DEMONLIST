@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Carey-baptist GD-Demonlist</title>
+  <title>Geometry Dash Demonlist</title>
   <style>
     :root {
       --bg-color: #121318;
@@ -11,6 +11,7 @@
       --accent-color: #ff3366;
       --text-color: #ffffff;
       --subtext-color: #a0a5b5;
+      --border-color: #2e323d;
     }
 
     body {
@@ -51,7 +52,7 @@
       padding: 20px;
       display: flex;
       gap: 20px;
-      align-items: center;
+      align-items: flex-start;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
       border-left: 5px solid var(--accent-color);
     }
@@ -62,6 +63,7 @@
       min-width: 45px;
       text-align: center;
       color: var(--accent-color);
+      margin-top: 5px;
     }
 
     .details {
@@ -94,12 +96,58 @@
     .video-btn:hover {
       opacity: 0.9;
     }
+
+    /* Leaderboard Styles */
+    .leaderboard {
+      margin-top: 15px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .leaderboard h3 {
+      margin: 0 0 10px 0;
+      font-size: 1rem;
+      color: var(--text-color);
+    }
+
+    .record-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .record-item {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.88rem;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 6px 10px;
+      border-radius: 4px;
+    }
+
+    .record-item a {
+      color: #3b82f6;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .record-item a:hover {
+      text-decoration: underline;
+    }
+
+    .percent {
+      color: var(--accent-color);
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>GD Demonlist</h1>
+    <h1>Carey Demonlist</h1>
     <p>Carey Baptist Forrestdale Demonlist</p>
     <p>Made by SHNAILBOY :D</p>
   </header>
@@ -120,14 +168,34 @@
           const card = document.createElement('div');
           card.className = 'level-card';
 
+          // Generate HTML for records list
+          let recordsHTML = '<p>No victors yet.</p>';
+          if (level.records && level.records.length > 0) {
+            recordsHTML = `<ul class="record-list">` + 
+              level.records.map(r => `
+                <li class="record-item">
+                  <span>
+                    <a href="${r.video}" target="_blank">${r.user}</a>
+                  </span>
+                  <span class="percent">${r.percent}%</span>
+                </li>
+              `).join('') + 
+            `</ul>`;
+          }
+
           card.innerHTML = `
             <div class="rank">#${index + 1}</div>
             <div class="details">
               <h2>${level.name}</h2>
               <p><strong>Publisher/Creator:</strong> ${level.publisher}</p>
-              <p><strong>Beaten by:</strong> ${level.verifier}</p>
+              <p><strong>Verifier:</strong> ${level.verifier}</p>
               <p><strong>Level ID:</strong> ${level.levelID}</p>
-              ${level.video ? `<a href="${level.video}" target="_blank" class="video-btn">Video</a>` : ''}
+              ${level.video ? `<a href="${level.video}" target="_blank" class="video-btn">Watch Verification</a>` : ''}
+
+              <div class="leaderboard">
+                <h3>Records / Victors</h3>
+                ${recordsHTML}
+              </div>
             </div>
           `;
 
