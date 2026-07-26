@@ -84,6 +84,7 @@
     .video-btn {
       display: inline-block;
       margin-top: 8px;
+      margin-bottom: 10px;
       padding: 6px 12px;
       background-color: var(--accent-color);
       color: white;
@@ -97,23 +98,31 @@
       opacity: 0.9;
     }
 
-    /* Leaderboard Styles */
-    .leaderboard {
-      margin-top: 15px;
+    /* Expandable Leaderboard Styles */
+    details.leaderboard {
+      margin-top: 10px;
       padding-top: 10px;
       border-top: 1px solid var(--border-color);
     }
 
-    .leaderboard h3 {
-      margin: 0 0 10px 0;
-      font-size: 1rem;
+    details.leaderboard summary {
+      font-weight: bold;
+      font-size: 0.95rem;
       color: var(--text-color);
+      cursor: pointer;
+      user-select: none;
+      padding: 4px 0;
+      transition: color 0.2s;
+    }
+
+    details.leaderboard summary:hover {
+      color: var(--accent-color);
     }
 
     .record-list {
       list-style: none;
       padding: 0;
-      margin: 0;
+      margin: 10px 0 0 0;
       display: flex;
       flex-direction: column;
       gap: 6px;
@@ -147,7 +156,7 @@
 <body>
 
   <header>
-    <h1>Carey Demonlist</h1>
+    <h1>Demonlist</h1>
     <p>Carey Baptist Forrestdale Demonlist</p>
     <p>Made by SHNAILBOY :D</p>
   </header>
@@ -157,53 +166,69 @@
 
   <script>
     async function loadDemonlist() {
+      const listContainer = document.getElementById('demon-list');
+      
       try {
         const response = await fetch('levels.json');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const levels = await response.json();
-        const listContainer = document.getElementById('demon-list');
+        renderLevels(levels);
 
-        listContainer.innerHTML = ''; // Clear container
-
-        levels.forEach((level, index) => {
-          const card = document.createElement('div');
-          card.className = 'level-card';
-
-          // Generate HTML for records list
-          let recordsHTML = '<p>No victors yet.</p>';
-          if (level.records && level.records.length > 0) {
-            recordsHTML = `<ul class="record-list">` + 
-              level.records.map(r => `
-                <li class="record-item">
-                  <span>
-                    <a href="${r.video}" target="_blank">${r.user}</a>
-                  </span>
-                  <span class="percent">${r.percent}%</span>
-                </li>
-              `).join('') + 
-            `</ul>`;
-          }
-
-          card.innerHTML = `
-            <div class="rank">#${index + 1}</div>
-            <div class="details">
-              <h2>${level.name}</h2>
-              <p><strong>Publisher/Creator:</strong> ${level.publisher}</p>
-              <p><strong>Verifier:</strong> ${level.verifier}</p>
-              <p><strong>Level ID:</strong> ${level.levelID}</p>
-              ${level.video ? `<a href="${level.video}" target="_blank" class="video-btn">Watch Verification</a>` : ''}
-
-              <div class="leaderboard">
-                <h3>Records / Victors</h3>
-                ${recordsHTML}
-              </div>
-            </div>
-          `;
-
-          listContainer.appendChild(card);
-        });
       } catch (error) {
         console.error("Error loading levels.json:", error);
+        listContainer.innerHTML = `
+          <div style="background: #2a1517; color: #ff6b6b; padding: 20px; border-radius: 8px; border: 1px solid #ff3366; text-align: center;">
+            <h3>⚠️ Unable to load levels.json</h3>
+            <p><strong>Reason:</strong> ${error.message}</p>
+          </div>
+        `;
       }
+    }
+
+    function renderLevels(levels) {
+      const listContainer = document.getElementById('demon-list');
+      listContainer.innerHTML = '';
+
+      levels.forEach((level, index) => {
+        const card = document.createElement('div');
+        card.className = 'level-card';
+
+        const recordCount = level.records ? level.records.length : 0;
+        let recordsHTML = '<p style="color: var(--subtext-color); font-size: 0.85rem; margin-top: 8px;">No victors yet.</p>';
+        
+        if (recordCount > 0) {
+          recordsHTML = `<ul class="record-list">` + 
+            level.records.map(r => `
+              <li class="record-item">
+                <span>
+                  <a href="${r.video}" target="_blank">${r.user}</a>
+                </span>
+                <span class="percent">${r.percent}%</span>
+              </li>
+            `).join('') + 
+          `</ul>`;
+        }
+
+        card.innerHTML = `
+          <div class="rank">#${index + 1}</div>
+          <div class="details">
+            <h2>${level.name}</h2>
+            <p><strong>Publisher/Creator:</strong> ${level.publisher}</p>
+            <p><strong>Verifier:</strong> ${level.verifier}</p>
+            <p><strong>Level ID:</strong> ${level.levelID}</p>
+            ${level.video ? `<a href="${level.video}" target="_blank" class="video-btn">Watch Verification</a>` : ''}
+
+            <details class="leaderboard">
+              <summary>Records / Victors (${recordCount})</summary>
+              ${recordsHTML}
+            </details>
+          </div>
+        `;
+
+        listContainer.appendChild(card);
+      });
     }
 
     loadDemonlist();
