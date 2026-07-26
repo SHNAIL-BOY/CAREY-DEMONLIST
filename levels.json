@@ -1,16 +1,26 @@
 [
   {
-    "name": "Acheron",
-    "publisher": "Riot",
-    "verifier": "Zoink",
+    "name": "Test",
+    "publisher": "SHNAIL",
+    "verifier": "SHNAIL",
     "levelID": "84323130",
-    "video": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-  },
-  {
-    "name": "Silent Clubstep",
-    "publisher": "Nailok",
-    "verifier": "Paqter",
-    "levelID": "79009949",
-    "video": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-  }
+    "video": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "records": [
+      {
+        "user": "Jimmy",
+        "percent": 100,
+        "video": "https://youtube.com"
+      },
+      {
+        "user": "Test",
+        "percent": 100,
+        "video": "https://youtube.com"
+      },
+      {
+        "user": Testtwo",
+        "percent": 100,
+        "video": "https://youtube.com"
+      }
+    ]
+
 ]
