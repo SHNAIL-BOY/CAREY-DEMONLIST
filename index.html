@@ -171,88 +171,93 @@
   <main class="container" id="demon-list">
     </main>
 
-  <script>
-// Helper function to extract YouTube Video ID from any standard URL
+<script>
+  // Helper function to extract YouTube Video ID from any standard URL
   function getYouTubeId(url) {
     if (!url) return null;
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
     const match = url.match(regExp);
     return (match && match[2].length === 11) ? match[2] : null;
   }
+
+  async function loadDemonlist() {
+    const listContainer = document.getElementById('demon-list');
     
-    async function loadDemonlist() {
-      const listContainer = document.getElementById('demon-list');
-      
-      try {
-        const response = await fetch('levels.json');
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const levels = await response.json();
-        renderLevels(levels);
-
-      } catch (error) {
-        console.error("Error loading levels.json:", error);
-        listContainer.innerHTML = `
-          <div style="background: #2a1517; color: #ff6b6b; padding: 20px; border-radius: 8px; border: 1px solid #ff3366; text-align: center;">
-            <h3>⚠️ Unable to load levels.json</h3>
-            <p><strong>Reason:</strong> ${error.message}</p>
-          </div>
-        `;
+    try {
+      const response = await fetch('levels.json');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+      const levels = await response.json();
+      renderLevels(levels);
+
+    } catch (error) {
+      console.error("Error loading levels.json:", error);
+      listContainer.innerHTML = `
+        <div style="background: #2a1517; color: #ff6b6b; padding: 20px; border-radius: 8px; border: 1px solid #ff3366; text-align: center;">
+          <h3>⚠️ Unable to load levels.json</h3>
+          <p><strong>Reason:</strong> ${error.message}</p>
+        </div>
+      `;
     }
+  }
 
-    function renderLevels(levels) {
-      const listContainer = document.getElementById('demon-list');
-      listContainer.innerHTML = '';
+  function renderLevels(levels) {
+    const listContainer = document.getElementById('demon-list');
+    listContainer.innerHTML = '';
 
-      levels.forEach((level, index) => {
-        const card = document.createElement('div');
-        card.className = 'level-card';
+    levels.forEach((level, index) => {
+      const card = document.createElement('div');
+      card.className = 'level-card';
 
-        //Extract YouTube ID & Build Thumbnail Image Tag
+      // 1. Extract YouTube ID & Build Thumbnail Image Tag
       const ytId = getYouTubeId(level.video);
       const thumbHTML = ytId 
         ? `<img class="card-banner" src="https://img.youtube.com/vi/${ytId}/hqdefault.jpg" alt="${level.name}">`
         : '';
 
-        const recordCount = level.records ? level.records.length : 0;
-        let recordsHTML = '<p style="color: var(--subtext-color); font-size: 0.85rem; margin-top: 8px;">No victors yet.</p>';
-        
-        if (recordCount > 0) {
-          recordsHTML = `<ul class="record-list">` + 
-            level.records.map(r => `
-              <li class="record-item">
-                <span>
-                  <a href="${r.video}" target="_blank">${r.user}</a>
-                </span>
-                <span class="percent">${r.percent}%</span>
-              </li>
-            `).join('') + 
-          `</ul>`;
-        }
+      const recordCount = level.records ? level.records.length : 0;
+      let recordsHTML = '<p style="color: var(--subtext-color); font-size: 0.85rem; margin-top: 8px;">No victors yet.</p>';
+      
+      if (recordCount > 0) {
+        recordsHTML = `<ul class="record-list">` + 
+          level.records.map(r => `
+            <li class="record-item">
+              <span>
+                ${r.video 
+                  ? `<a href="${r.video}" target="_blank">${r.user}</a>` 
+                  : `<span>${r.user}</span>`
+                }
+              </span>
+              <span class="percent">${r.percent}%</span>
+            </li>
+          `).join('') + 
+        `</ul>`;
+      }
 
-        card.innerHTML = `
-          <div class="rank">#${index + 1}</div>
-          <div class="details">
-            <h2>${level.name}</h2>
-            <p><strong>Publisher/Creator:</strong> ${level.publisher}</p>
-            <p><strong>Verifier:</strong> ${level.verifier}</p>
-            <p><strong>Level ID:</strong> ${level.levelID}</p>
-            ${level.video ? `<a href="${level.video}" target="_blank" class="video-btn">Watch Verification</a>` : ''}
+      // 2. Include ${thumbHTML} in card HTML
+      card.innerHTML = `
+        <div class="rank">#${index + 1}</div>
+        ${thumbHTML}
+        <div class="details">
+          <h2>${level.name}</h2>
+          <p><strong>Publisher/Creator:</strong> ${level.publisher}</p>
+          <p><strong>Verifier:</strong> ${level.verifier}</p>
+          <p><strong>Level ID:</strong> ${level.levelID}</p>
+          ${level.video ? `<a href="${level.video}" target="_blank" class="video-btn">Watch Verification</a>` : ''}
 
-            <details class="leaderboard">
-              <summary>Records / Victors (${recordCount})</summary>
-              ${recordsHTML}
-            </details>
-          </div>
-        `;
+          <details class="leaderboard">
+            <summary>Records / Victors (${recordCount})</summary>
+            ${recordsHTML}
+          </details>
+        </div>
+      `;
 
-        listContainer.appendChild(card);
-      });
-    }
+      listContainer.appendChild(card);
+    });
+  }
 
-    loadDemonlist();
-  </script>
+  loadDemonlist();
+</script>
 </body>
 </html>
