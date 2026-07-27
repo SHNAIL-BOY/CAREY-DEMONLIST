@@ -2,9 +2,9 @@
   {
     "name": "Sonic Wave",
     "publisher": "Cyclic",
-    "verifier": "Sunix",
+    "verifier": "Lsunix",
     "levelID": "26681070",
-    "video": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "video": "https://www.youtube.com/watch?v=GpXTwPgweAk",
     "records": [
       {
         "user": "SHNAILBOY",
@@ -17,7 +17,33 @@
     "publisher": "Riot",
     "verifier": "Riot",
     "levelID": "10565740",
-    "video": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "video": "https://youtu.be/twTw4fjT0ik?t=110",
+    "records": [
+      {
+        "user": "SHNAILBOY",
+        "percent": 100
+      }
+    ]
+  },
+  {
+    "name": "Slay Moment",
+    "publisher": "RafaBirds",
+    "verifier": "RafaBirds",
+    "levelID": "118366680",
+    "video": "https://youtu.be/O4cyhCpTT_c",
+    "records": [
+      {
+        "user": "SHNAILBOY",
+        "percent": 100
+      }
+    ]
+  },
+  {
+    "name": "Sweater Weather",
+    "publisher": "Vel",
+    "verifier": "Xfire",
+    "levelID": "81148582",
+    "video": "https://youtu.be/y3Kk0ZvDqUM",
     "records": [
       {
         "user": "SHNAILBOY",
