@@ -151,6 +151,13 @@
       color: var(--accent-color);
       font-weight: bold;
     }
+
+  .card-banner {
+  width: 140px;
+  height: 80px;
+  border-radius: 6px;
+  object-fit: cover;
+}
   </style>
 </head>
 <body>
@@ -165,6 +172,14 @@
     </main>
 
   <script>
+// Helper function to extract YouTube Video ID from any standard URL
+  function getYouTubeId(url) {
+    if (!url) return null;
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+  }
+    
     async function loadDemonlist() {
       const listContainer = document.getElementById('demon-list');
       
@@ -194,6 +209,12 @@
       levels.forEach((level, index) => {
         const card = document.createElement('div');
         card.className = 'level-card';
+
+        //Extract YouTube ID & Build Thumbnail Image Tag
+      const ytId = getYouTubeId(level.video);
+      const thumbHTML = ytId 
+        ? `<img class="card-banner" src="https://img.youtube.com/vi/${ytId}/hqdefault.jpg" alt="${level.name}">`
+        : '';
 
         const recordCount = level.records ? level.records.length : 0;
         let recordsHTML = '<p style="color: var(--subtext-color); font-size: 0.85rem; margin-top: 8px;">No victors yet.</p>';
