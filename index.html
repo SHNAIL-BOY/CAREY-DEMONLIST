@@ -26,64 +26,126 @@
       position: relative;
     }
 
-    /* Top Right Collapsible Menu */
+    /* Top Right Leaderboard Box Container */
     .nav-container {
       position: absolute;
       top: 20px;
       right: 20px;
     }
 
+    /* Toggle Button */
     .menu-btn {
       background-color: var(--card-bg);
       color: var(--accent-color);
       border: 1px solid var(--border-color);
-      font-size: 1.4rem;
-      padding: 6px 12px;
+      font-size: 0.95rem;
+      font-weight: bold;
+      padding: 8px 14px;
       border-radius: 6px;
       cursor: pointer;
-      transition: background-color 0.2s;
+      transition: background-color 0.2s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .menu-btn:hover {
       background-color: var(--border-color);
     }
 
-    .menu-content {
-      display: none;
+    .menu-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* Collapsible Leaderboard Popup Box */
+    .leaderboard-popup {
+      display: none; /* Hidden by default */
       position: absolute;
       right: 0;
       top: 45px;
       background-color: var(--card-bg);
       border: 1px solid var(--border-color);
       border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-      min-width: 170px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+      width: 310px;
       z-index: 1000;
-      flex-direction: column;
-      overflow: hidden;
+      padding: 16px;
+      box-sizing: border-box;
     }
 
-    .menu-content.show {
-      display: flex;
+    .leaderboard-popup.show {
+      display: block;
     }
 
-    .menu-content a {
-      color: var(--text-color);
-      padding: 12px 16px;
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 0.9rem;
-      border-bottom: 1px solid var(--border-color);
-      transition: background-color 0.2s, color 0.2s;
-    }
-
-    .menu-content a:last-child {
-      border-bottom: none;
-    }
-
-    .menu-content a:hover {
-      background-color: rgba(42, 250, 138, 0.1);
+    .popup-title {
+      margin: 0 0 12px 0;
+      font-size: 1.1rem;
       color: var(--accent-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 8px;
+    }
+
+    .popup-title span {
+      font-size: 0.75rem;
+      color: var(--subtext-color);
+      font-weight: normal;
+    }
+
+    /* Mini Leaderboard List */
+    .top-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 350px;
+      overflow-y: auto;
+    }
+
+    .top-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 0.88rem;
+    }
+
+    .top-item .player-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .top-item .rank-badge {
+      color: var(--accent-color);
+      font-weight: bold;
+      min-width: 24px;
+    }
+
+    .top-item .player-name {
+      font-weight: 600;
+    }
+
+    .top-item .player-stats {
+      text-align: right;
+    }
+
+    .top-item .points {
+      color: var(--accent-color);
+      font-weight: bold;
+      font-size: 0.85rem;
+    }
+
+    .top-item .demons {
+      font-size: 0.72rem;
+      color: var(--subtext-color);
+      display: block;
     }
 
     header {
@@ -220,53 +282,18 @@
       color: var(--accent-color);
       font-weight: bold;
     }
-
-    .section-title {
-      margin-top: 40px;
-      font-size: 1.8rem;
-      color: var(--accent-color);
-      text-align: center;
-      scroll-margin-top: 20px;
-    }
-
-    .leaderboard-table {
-      width: 100%;
-      border-collapse: collapse;
-      background-color: var(--card-bg);
-      border-radius: 8px;
-      overflow: hidden;
-      margin-top: 15px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    }
-
-    .leaderboard-table th, 
-    .leaderboard-table td {
-      padding: 12px 16px;
-      text-align: left;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .leaderboard-table th {
-      background-color: rgba(0, 0, 0, 0.4);
-      color: var(--accent-color);
-      text-transform: uppercase;
-      font-size: 0.85rem;
-      letter-spacing: 1px;
-    }
-
-    .points {
-      color: var(--accent-color);
-      font-weight: bold;
-    }
   </style>
 </head>
 <body>
 
   <div class="nav-container">
-    <button class="menu-btn" id="menuToggle" aria-label="Toggle menu">☰</button>
-    <div class="menu-content" id="dropdownMenu">
-      <a href="#demon-list">📜 Demon List</a>
-      <a href="#leaderboard-title">🏆 Leaderboard</a>
+    <button class="menu-btn" id="menuToggle">🏆 Leaderboard</button>
+    <div class="leaderboard-popup" id="leaderboardPopup">
+      <h3 class="popup-title">
+        🏆 Top 10 Players
+        <span>Points</span>
+      </h3>
+      <div id="popup-leaderboard-content"></div>
     </div>
   </div>
 
@@ -278,31 +305,23 @@
 
   <main class="container">
     <div id="demon-list" class="container"></div>
-
-    <h2 id="leaderboard-title" class="section-title">🏆 Player Leaderboard</h2>
-    <div id="leaderboard-container"></div>
   </main>
 
   <script>
-    // --- 1. MENU TOGGLE INTERACTION ---
+    // --- 1. POPUP TOGGLE LOGIC ---
     const menuToggle = document.getElementById('menuToggle');
-    const dropdownMenu = document.getElementById('dropdownMenu');
+    const leaderboardPopup = document.getElementById('leaderboardPopup');
 
     menuToggle.addEventListener('click', (e) => {
       e.stopPropagation();
-      dropdownMenu.classList.toggle('show');
+      leaderboardPopup.classList.toggle('show');
     });
 
+    // Close box when clicking outside of it
     document.addEventListener('click', (e) => {
-      if (!dropdownMenu.contains(e.target) && e.target !== menuToggle) {
-        dropdownMenu.classList.remove('show');
+      if (!leaderboardPopup.contains(e.target) && e.target !== menuToggle) {
+        leaderboardPopup.classList.remove('show');
       }
-    });
-
-    dropdownMenu.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', () => {
-        dropdownMenu.classList.remove('show');
-      });
     });
 
     // --- 2. YOUTUBE THUMBNAIL HELPER ---
@@ -313,7 +332,7 @@
       return (match && match[2].length === 11) ? match[2] : null;
     }
 
-    // --- 3. FETCH AND INITIALIZE DATA ---
+    // --- 3. FETCH AND PROCESS DATA ---
     async function loadDemonlist() {
       const listContainer = document.getElementById('demon-list');
       
@@ -327,7 +346,7 @@
         renderLevels(levels);
         
         const sortedPlayers = calculateLeaderboard(levels);
-        renderLeaderboard(sortedPlayers);
+        renderTop10Leaderboard(sortedPlayers);
 
       } catch (error) {
         console.error("Error loading levels.json:", error);
@@ -394,12 +413,11 @@
       });
     }
 
-    // --- 5. CALCULATE PLAYER POINTS ---
+    // --- 5. CALCULATE SCORES ---
     function calculateLeaderboard(levels) {
       const players = {};
 
       levels.forEach((level, index) => {
-        // #1 level gives 100 max points, decreases by 10 per rank down to a min of 10 points
         const maxPoints = Math.max(10, 100 - index * 10);
 
         if (level.records && Array.isArray(level.records)) {
@@ -423,44 +441,39 @@
       return Object.values(players).sort((a, b) => b.score - a.score);
     }
 
-    // --- 6. RENDER PLAYER LEADERBOARD TABLE ---
-    function renderLeaderboard(players) {
-      const container = document.getElementById('leaderboard-container');
+    // --- 6. RENDER TOP 10 PLAYERS IN POPUP ---
+    function renderTop10Leaderboard(players) {
+      const container = document.getElementById('popup-leaderboard-content');
 
       if (players.length === 0) {
-        container.innerHTML = '<p style="text-align:center; color: var(--subtext-color);">No records submitted yet!</p>';
+        container.innerHTML = '<p style="text-align:center; color: var(--subtext-color); font-size: 0.85rem;">No victors yet!</p>';
         return;
       }
 
-      let html = `
-        <table class="leaderboard-table">
-          <thead>
-            <tr>
-              <th>Rank</th>
-              <th>Player</th>
-              <th>Demons Beaten</th>
-              <th>Points</th>
-            </tr>
-          </thead>
-          <tbody>
-      `;
+      // Slice array to show ONLY the Top 10 players
+      const top10 = players.slice(0, 10);
 
-      players.forEach((player, index) => {
+      let html = `<ul class="top-list">`;
+
+      top10.forEach((player, index) => {
         html += `
-          <tr>
-            <td><strong>#${index + 1}</strong></td>
-            <td>${player.name}</td>
-            <td>${player.completions}</td>
-            <td class="points">${player.score} pts</td>
-          </tr>
+          <li class="top-item">
+            <div class="player-info">
+              <span class="rank-badge">#${index + 1}</span>
+              <span class="player-name">${player.name}</span>
+            </div>
+            <div class="player-stats">
+              <span class="points">${player.score} pts</span>
+              <span class="demons">${player.completions} demon${player.completions === 1 ? '' : 's'}</span>
+            </div>
+          </li>
         `;
       });
 
-      html += `</tbody></table>`;
+      html += `</ul>`;
       container.innerHTML = html;
     }
 
-    // Run when loaded
     loadDemonlist();
   </script>
 </body>
