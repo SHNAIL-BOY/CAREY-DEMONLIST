@@ -23,10 +23,72 @@
       flex-direction: column;
       align-items: center;
       padding: 20px;
+      position: relative;
+    }
+
+    /* Top Right Collapsible Menu */
+    .nav-container {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+
+    .menu-btn {
+      background-color: var(--card-bg);
+      color: var(--accent-color);
+      border: 1px solid var(--border-color);
+      font-size: 1.4rem;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .menu-btn:hover {
+      background-color: var(--border-color);
+    }
+
+    .menu-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 45px;
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      min-width: 170px;
+      z-index: 1000;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .menu-content.show {
+      display: flex;
+    }
+
+    .menu-content a {
+      color: var(--text-color);
+      padding: 12px 16px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.9rem;
+      border-bottom: 1px solid var(--border-color);
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    .menu-content a:last-child {
+      border-bottom: none;
+    }
+
+    .menu-content a:hover {
+      background-color: rgba(42, 250, 138, 0.1);
+      color: var(--accent-color);
     }
 
     header {
       text-align: center;
+      margin-top: 10px;
       margin-bottom: 30px;
     }
 
@@ -56,318 +118,3 @@
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
       border-left: 5px solid var(--accent-color);
     }
-
-    .card-banner {
-      width: 140px;
-      height: 80px;
-      border-radius: 6px;
-      object-fit: cover;
-      flex-shrink: 0;
-    }
-
-    .rank {
-      font-size: 2rem;
-      font-weight: bold;
-      min-width: 45px;
-      text-align: center;
-      color: var(--accent-color);
-      margin-top: 5px;
-    }
-
-    .details {
-      flex: 1;
-    }
-
-    .details h2 {
-      margin: 0 0 5px 0;
-      font-size: 1.4rem;
-    }
-
-    .details p {
-      margin: 3px 0;
-      color: var(--subtext-color);
-      font-size: 0.9rem;
-    }
-
-    .video-btn {
-      display: inline-block;
-      margin-top: 8px;
-      margin-bottom: 10px;
-      padding: 6px 12px;
-      background-color: var(--accent-color);
-      color: white;
-      text-decoration: none;
-      border-radius: 4px;
-      font-size: 0.85rem;
-      font-weight: bold;
-    }
-
-    .video-btn:hover {
-      opacity: 0.9;
-    }
-
-    /* Expandable Leaderboard Styles */
-    details.leaderboard {
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px solid var(--border-color);
-    }
-
-    details.leaderboard summary {
-      font-weight: bold;
-      font-size: 0.95rem;
-      color: var(--text-color);
-      cursor: pointer;
-      user-select: none;
-      padding: 4px 0;
-      transition: color 0.2s;
-    }
-
-    details.leaderboard summary:hover {
-      color: var(--accent-color);
-    }
-
-    .record-list {
-      list-style: none;
-      padding: 0;
-      margin: 10px 0 0 0;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .record-item {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.88rem;
-      background: rgba(0, 0, 0, 0.2);
-      padding: 6px 10px;
-      border-radius: 4px;
-    }
-
-    .record-item a {
-      color: #3b82f6;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    .record-item a:hover {
-      text-decoration: underline;
-    }
-
-    .percent {
-      color: var(--accent-color);
-      font-weight: bold;
-    }
-
-    /* Player Leaderboard Table Styles */
-    .section-title {
-      margin-top: 40px;
-      font-size: 1.8rem;
-      color: var(--accent-color);
-      text-align: center;
-    }
-
-    .leaderboard-table {
-      width: 100%;
-      border-collapse: collapse;
-      background-color: var(--card-bg);
-      border-radius: 8px;
-      overflow: hidden;
-      margin-top: 15px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    }
-
-    .leaderboard-table th, 
-    .leaderboard-table td {
-      padding: 12px 16px;
-      text-align: left;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .leaderboard-table th {
-      background-color: rgba(0, 0, 0, 0.4);
-      color: var(--accent-color);
-      text-transform: uppercase;
-      font-size: 0.85rem;
-      letter-spacing: 1px;
-    }
-
-    .points {
-      color: var(--accent-color);
-      font-weight: bold;
-    }
-  </style>
-</head>
-<body>
-
-  <header>
-    <h1>Demonlist</h1>
-    <p>Carey Baptist Forrestdale Demonlist</p>
-    <p>Made by SHNAILBOY :D</p>
-  </header>
-
-  <main class="container">
-    <div id="demon-list" class="container"></div>
-
-    <h2 class="section-title">🏆 Player Leaderboard</h2>
-    <div id="leaderboard-container"></div>
-  </main>
-
-  <script>
-    // Extract YouTube ID for thumbnails
-    function getYouTubeId(url) {
-      if (!url) return null;
-      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-      const match = url.match(regExp);
-      return (match && match[2].length === 11) ? match[2] : null;
-    }
-
-    async function loadDemonlist() {
-      const listContainer = document.getElementById('demon-list');
-      
-      try {
-        const response = await fetch('levels.json');
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const levels = await response.json();
-        
-        renderLevels(levels);
-        
-        // Calculate player ranks and render leaderboard
-        const sortedPlayers = calculateLeaderboard(levels);
-        renderLeaderboard(sortedPlayers);
-
-      } catch (error) {
-        console.error("Error loading levels.json:", error);
-        listContainer.innerHTML = `
-          <div style="background: #2a1517; color: #ff6b6b; padding: 20px; border-radius: 8px; border: 1px solid #ff3366; text-align: center;">
-            <h3>⚠️ Unable to load levels.json</h3>
-            <p><strong>Reason:</strong> ${error.message}</p>
-          </div>
-        `;
-      }
-    }
-
-    function renderLevels(levels) {
-      const listContainer = document.getElementById('demon-list');
-      listContainer.innerHTML = '';
-
-      levels.forEach((level, index) => {
-        const card = document.createElement('div');
-        card.className = 'level-card';
-
-        const ytId = getYouTubeId(level.video);
-        const thumbHTML = ytId 
-          ? `<img class="card-banner" src="https://img.youtube.com/vi/${ytId}/hqdefault.jpg" alt="${level.name}">`
-          : '';
-
-        const recordCount = level.records ? level.records.length : 0;
-        let recordsHTML = '<p style="color: var(--subtext-color); font-size: 0.85rem; margin-top: 8px;">No victors yet.</p>';
-        
-        if (recordCount > 0) {
-          recordsHTML = `<ul class="record-list">` + 
-            level.records.map(r => `
-              <li class="record-item">
-                <span>
-                  ${r.video 
-                    ? `<a href="${r.video}" target="_blank">${r.user}</a>` 
-                    : `<span>${r.user}</span>`
-                  }
-                </span>
-                <span class="percent">${r.percent}%</span>
-              </li>
-            `).join('') + 
-          `</ul>`;
-        }
-
-        card.innerHTML = `
-          <div class="rank">#${index + 1}</div>
-          ${thumbHTML}
-          <div class="details">
-            <h2>${level.name}</h2>
-            <p><strong>Publisher/Creator:</strong> ${level.publisher}</p>
-            <p><strong>Verifier:</strong> ${level.verifier}</p>
-            <p><strong>Level ID:</strong> ${level.levelID}</p>
-            ${level.video ? `<a href="${level.video}" target="_blank" class="video-btn">Watch Verification</a>` : ''}
-
-            <details class="leaderboard">
-              <summary>Records / Victors (${recordCount})</summary>
-              ${recordsHTML}
-            </details>
-          </div>
-        `;
-
-        listContainer.appendChild(card);
-      });
-    }
-
-    function calculateLeaderboard(levels) {
-      const players = {};
-
-      levels.forEach((level, index) => {
-        // #1 level gives 100 max pts, #2 gives 90 max pts, etc. (Minimum 10 pts)
-        const maxPoints = Math.max(10, 100 - index * 10);
-
-        if (level.records && Array.isArray(level.records)) {
-          level.records.forEach(record => {
-            const username = record.user;
-            const percent = record.percent || 100;
-            const earnedPoints = Math.round((maxPoints * percent) / 100);
-
-            if (!players[username]) {
-              players[username] = { name: username, score: 0, completions: 0 };
-            }
-
-            players[username].score += earnedPoints;
-            if (percent === 100) {
-              players[username].completions += 1;
-            }
-          });
-        }
-      });
-
-      return Object.values(players).sort((a, b) => b.score - a.score);
-    }
-
-    function renderLeaderboard(players) {
-      const container = document.getElementById('leaderboard-container');
-
-      if (players.length === 0) {
-        container.innerHTML = '<p style="text-align:center; color: var(--subtext-color);">No records submitted yet!</p>';
-        return;
-      }
-
-      let html = `
-        <table class="leaderboard-table">
-          <thead>
-            <tr>
-              <th>Rank</th>
-              <th>Player</th>
-              <th>Demons Beaten</th>
-              <th>Points</th>
-            </tr>
-          </thead>
-          <tbody>
-      `;
-
-      players.forEach((player, index) => {
-        html += `
-          <tr>
-            <td><strong>#${index + 1}</strong></td>
-            <td>${player.name}</td>
-            <td>${player.completions}</td>
-            <td class="points">${player.score} pts</td>
-          </tr>
-        `;
-      });
-
-      html += `</tbody></table>`;
-      container.innerHTML = html;
-    }
-
-    loadDemonlist();
-  </script>
-</body>
-</html>
