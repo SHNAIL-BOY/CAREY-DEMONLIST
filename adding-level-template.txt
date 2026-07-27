@@ -12,6 +12,7 @@ level:
 ]
 
 add records:
+
 "records": [
      {
         "user": "SHNAILBOY",
@@ -19,3 +20,24 @@ add records:
         "video": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
       }
     ]
+
+multiple levels:
+
+[
+  {
+    "name": "Bloodbath",
+    "publisher": "Riot",
+    "verifier": "Riot",
+    "levelID": "10565740",
+    "video": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "records": []
+  },
+  {
+    "name": "SLAY MOMENT",
+    "publisher": "Rafabirds",
+    "verifier": "Rafabrids",
+    "levelID": "118366680",
+    "video": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "records": []
+  }
+]
