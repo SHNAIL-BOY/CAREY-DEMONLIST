@@ -8,6 +8,20 @@
     "records": [
       {
         "user": "SHNAILBOY",
+        "percent": 100,
+      }
+    ]
+  }
+
+    {
+    "name": "Bloodbath",
+    "publisher": "Riot",
+    "verifier": "Riot",
+    "levelID": "10565740",
+    "video": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "records": [
+      {
+        "user": "SHNAILBOY",
         "percent": 100
       }
     ]
