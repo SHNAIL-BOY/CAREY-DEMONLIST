@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Carey-Demonlist</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
       --bg-color: #121318;
@@ -26,15 +27,17 @@
       position: relative;
     }
 
-    /* Top Right Leaderboard Box Container */
+    /* Fixed Top Right Leaderboard Container */
     .nav-container {
       position: fixed;
       top: 20px;
       right: 20px;
+      z-index: 1000;
+      display: flex;
+      gap: 10px;
     }
 
-    /* Toggle Button */
-    .menu-btn {
+    .nav-btn {
       background-color: var(--card-bg);
       color: var(--accent-color);
       border: 1px solid var(--border-color);
@@ -43,23 +46,21 @@
       padding: 8px 14px;
       border-radius: 6px;
       cursor: pointer;
-      transition: background-color 0.2s, transform 0.1s;
+      text-decoration: none;
+      transition: background-color 0.2s;
       display: flex;
       align-items: center;
       gap: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     }
 
-    .menu-btn:hover {
+    .nav-btn:hover {
       background-color: var(--border-color);
-    }
-
-    .menu-btn:active {
-      transform: scale(0.98);
     }
 
     /* Collapsible Leaderboard Popup Box */
     .leaderboard-popup {
-      display: none; /* Hidden by default */
+      display: none;
       position: absolute;
       right: 0;
       top: 45px;
@@ -68,7 +69,6 @@
       border-radius: 8px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.6);
       width: 310px;
-      z-index: 1000;
       padding: 16px;
       box-sizing: border-box;
     }
@@ -94,7 +94,6 @@
       font-weight: normal;
     }
 
-    /* Mini Leaderboard List */
     .top-list {
       list-style: none;
       padding: 0;
@@ -219,7 +218,7 @@
       margin-bottom: 10px;
       padding: 6px 12px;
       background-color: var(--accent-color);
-      color: white;
+      color: black;
       text-decoration: none;
       border-radius: 4px;
       font-size: 0.85rem;
@@ -243,7 +242,6 @@
       cursor: pointer;
       user-select: none;
       padding: 4px 0;
-      transition: color 0.2s;
     }
 
     details.leaderboard summary:hover {
@@ -274,10 +272,6 @@
       font-weight: bold;
     }
 
-    .record-item a:hover {
-      text-decoration: underline;
-    }
-
     .percent {
       color: var(--accent-color);
       font-weight: bold;
@@ -287,7 +281,9 @@
 <body>
 
   <div class="nav-container">
-    <button class="menu-btn" id="menuToggle">🏆 Leaderboard</button>
+    <a href="admin.html" class="nav-btn">👤 Account</a>
+    <button class="nav-btn" id="menuToggle">🏆 Leaderboard</button>
+
     <div class="leaderboard-popup" id="leaderboardPopup">
       <h3 class="popup-title">
         🏆 Top 10 Players
@@ -308,7 +304,12 @@
   </main>
 
   <script>
-    // --- 1. POPUP TOGGLE LOGIC ---
+    // --- 1. SUPABASE CONFIGURATION ---
+    const SUPABASE_URL = 'YOUR_SUPABASE_URL_HERE';
+    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY_HERE';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // --- 2. LEADERBOARD POPUP INTERACTION ---
     const menuToggle = document.getElementById('menuToggle');
     const leaderboardPopup = document.getElementById('leaderboardPopup');
 
@@ -317,14 +318,13 @@
       leaderboardPopup.classList.toggle('show');
     });
 
-    // Close box when clicking outside of it
     document.addEventListener('click', (e) => {
       if (!leaderboardPopup.contains(e.target) && e.target !== menuToggle) {
         leaderboardPopup.classList.remove('show');
       }
     });
 
-    // --- 2. YOUTUBE THUMBNAIL HELPER ---
+    // --- 3. HELPER: YOUTUBE THUMBNAIL ---
     function getYouTubeId(url) {
       if (!url) return null;
       const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
@@ -332,39 +332,39 @@
       return (match && match[2].length === 11) ? match[2] : null;
     }
 
-    // --- 3. FETCH AND PROCESS DATA ---
+    // --- 4. FETCH DEMON LIST FROM SUPABASE ---
     async function loadDemonlist() {
       const listContainer = document.getElementById('demon-list');
-      
+
       try {
-        const response = await fetch('levels.json');
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const levels = await response.json();
-        
+        const { data: levels, error } = await supabase
+          .from('levels')
+          .select('*')
+          .order('rank_position', { ascending: true });
+
+        if (error) throw error;
+
         renderLevels(levels);
-        
         const sortedPlayers = calculateLeaderboard(levels);
         renderTop10Leaderboard(sortedPlayers);
 
       } catch (error) {
-        console.error("Error loading levels.json:", error);
+        console.error("Error fetching levels:", error);
         listContainer.innerHTML = `
-          <div style="background: #2a1517; color: #ff6b6b; padding: 20px; border-radius: 8px; border: 1px solid #ff3366; text-align: center;">
-            <h3>⚠️ Unable to load levels.json</h3>
-            <p><strong>Reason:</strong> ${error.message}</p>
+          <div style="background: #2a1517; color: #ff6b6b; padding: 20px; border-radius: 8px; text-align: center;">
+            <h3>⚠️ Unable to load Demonlist</h3>
+            <p>${error.message}</p>
           </div>
         `;
       }
     }
 
-    // --- 4. RENDER DEMON CARDS ---
+    // --- 5. RENDER DEMON CARDS ---
     function renderLevels(levels) {
       const listContainer = document.getElementById('demon-list');
       listContainer.innerHTML = '';
 
-      levels.forEach((level, index) => {
+      levels.forEach((level) => {
         const card = document.createElement('div');
         card.className = 'level-card';
 
@@ -375,7 +375,7 @@
 
         const recordCount = level.records ? level.records.length : 0;
         let recordsHTML = '<p style="color: var(--subtext-color); font-size: 0.85rem; margin-top: 8px;">No victors yet.</p>';
-        
+
         if (recordCount > 0) {
           recordsHTML = `<ul class="record-list">` + 
             level.records.map(r => `
@@ -393,13 +393,13 @@
         }
 
         card.innerHTML = `
-          <div class="rank">#${index + 1}</div>
+          <div class="rank">#${level.rank_position}</div>
           ${thumbHTML}
           <div class="details">
             <h2>${level.name}</h2>
             <p><strong>Publisher/Creator:</strong> ${level.publisher}</p>
             <p><strong>Verifier:</strong> ${level.verifier}</p>
-            <p><strong>Level ID:</strong> ${level.levelID}</p>
+            <p><strong>Level ID:</strong> ${level.level_id}</p>
             ${level.video ? `<a href="${level.video}" target="_blank" class="video-btn">Watch Verification</a>` : ''}
 
             <details class="leaderboard">
@@ -413,7 +413,7 @@
       });
     }
 
-    // --- 5. CALCULATE SCORES ---
+    // --- 6. CALCULATE PLAYER SCORE ---
     function calculateLeaderboard(levels) {
       const players = {};
 
@@ -441,7 +441,7 @@
       return Object.values(players).sort((a, b) => b.score - a.score);
     }
 
-    // --- 6. RENDER TOP 10 PLAYERS IN POPUP ---
+    // --- 7. RENDER TOP 10 PLAYERS ---
     function renderTop10Leaderboard(players) {
       const container = document.getElementById('popup-leaderboard-content');
 
@@ -450,9 +450,7 @@
         return;
       }
 
-      // Slice array to show ONLY the Top 10 players
       const top10 = players.slice(0, 10);
-
       let html = `<ul class="top-list">`;
 
       top10.forEach((player, index) => {
