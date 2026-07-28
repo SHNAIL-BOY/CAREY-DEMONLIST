@@ -15,10 +15,10 @@
       --subtext-color: #a0a5b5;
     }
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-color); color: var(--text-color); padding: 20px; display: flex; flex-direction: column; align-items: center; }
-    .card { background: var(--card-bg); padding: 25px; border-radius: 8px; width: 100%; max-width: 420px; border: 1px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
-    h2 { color: var(--accent-color); margin-top: 0; }
-    input, button { width: 100%; padding: 12px; margin-top: 10px; border-radius: 6px; border: 1px solid var(--border-color); box-sizing: border-box; }
-    input { background: #2e323d; color: white; }
+    .card { background: var(--card-bg); padding: 25px; border-radius: 8px; width: 100%; max-width: 450px; border: 1px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.5); margin-bottom: 20px; }
+    h2, h3 { color: var(--accent-color); margin-top: 0; }
+    input, select, button { width: 100%; padding: 12px; margin-top: 10px; border-radius: 6px; border: 1px solid var(--border-color); box-sizing: border-box; }
+    input, select { background: #2e323d; color: white; }
     button { background: var(--accent-color); color: black; font-weight: bold; cursor: pointer; border: none; }
     .btn-secondary { background: transparent; color: var(--accent-color); border: 1px solid var(--accent-color); }
     .btn-secondary:hover { background: rgba(42, 250, 138, 0.1); }
@@ -26,6 +26,7 @@
     .msg { margin-top: 10px; font-size: 0.85rem; text-align: center; }
     .back-link { margin-bottom: 20px; color: var(--subtext-color); text-decoration: none; font-size: 0.9rem; }
     .back-link:hover { color: var(--accent-color); }
+    hr { border-color: var(--border-color); margin: 25px 0; }
   </style>
 </head>
 <body>
@@ -48,7 +49,7 @@
     <p id="roleBadge" style="color: var(--subtext-color); font-size: 0.9rem;"></p>
 
     <div id="adminForm" class="hidden">
-      <hr style="border-color: var(--border-color); margin: 20px 0;" />
+      
       <h3>➕ Add New Demon</h3>
       <input type="number" id="rank" placeholder="Rank Position (e.g. 1)" />
       <input type="text" id="name" placeholder="Level Name" />
@@ -57,26 +58,34 @@
       <input type="text" id="levelID" placeholder="Level ID" />
       <input type="text" id="video" placeholder="YouTube Verification Link" />
       <button type="button" onclick="addLevel()" style="margin-top: 15px;">Save Level</button>
+
+      <hr />
+
+      <h3>🏆 Add Player Record</h3>
+      <select id="levelSelect">
+        <option value="">Loading levels...</option>
+      </select>
+      <input type="text" id="playerName" placeholder="Player Name" />
+      <input type="number" id="playerPercent" placeholder="Percentage (e.g. 100)" min="1" max="100" value="100" />
+      <input type="text" id="playerVideo" placeholder="Proof Link (YouTube URL)" />
+      <button type="button" onclick="addRecord()" style="margin-top: 15px;">Add Record</button>
+
     </div>
 
-    <button type="button" onclick="logout()" class="btn-secondary" style="margin-top: 20px;">Log Out</button>
+    <button type="button" onclick="logout()" class="btn-secondary" style="margin-top: 25px;">Log Out</button>
   </div>
 
   <script>
-    // Configuration
-    const SUPABASE_URL = 'https://eqjykpurejkdvvjnicoq.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxanlrcHVyZWprZHZ2am5pY29xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUyMTk5NTUsImV4cCI6MjEwMDc5NTk1NX0.Zw5PerSoU3yR1EOJoNSEzl_cVNUr4tIgjm2ZPm3gqWY';
-    const ADMIN_USER_ID = '2814f2e8-ea23-4924-8181-5d68cc6bd836';
+    const SUPABASE_URL = 'YOUR_SUPABASE_URL_HERE';
+    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY_HERE';
+    const ADMIN_USER_ID = 'YOUR-EXACT-USER-ID-HERE';
 
-    // Initialize Supabase Client once
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let loadedLevels = [];
 
     async function checkAuth() {
       const { data: { session }, error } = await supabaseClient.auth.getSession();
-      if (error) {
-        console.error("Auth check error:", error);
-        return;
-      }
+      if (error) return console.error("Auth error:", error);
 
       if (session) {
         document.getElementById('authCard').classList.add('hidden');
@@ -85,80 +94,75 @@
         const user = session.user;
         document.getElementById('welcomeText').innerText = `Logged in as ${user.email}`;
 
-        // Check if user is Admin
         if (user.id === ADMIN_USER_ID) {
           document.getElementById('roleBadge').innerText = 'Role: Admin (Full Edit Access)';
           document.getElementById('adminForm').classList.remove('hidden');
+          loadLevelSelectOptions(); // Populate level dropdown
         } else {
           document.getElementById('roleBadge').innerText = 'Role: Member (View Only)';
         }
       }
     }
 
-    async function login() {
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value.trim();
-      const msgBox = document.getElementById('authMsg');
+    // --- POPULATE LEVEL SELECT DROPDOWN ---
+    async function loadLevelSelectOptions() {
+      const select = document.getElementById('levelSelect');
+      const { data: levels, error } = await supabaseClient
+        .from('levels')
+        .select('*')
+        .order('rank_position', { ascending: true });
 
-      if (!email || !password) {
-        msgBox.style.color = '#ff6b6b';
-        msgBox.innerText = 'Please enter both email and password.';
+      if (error || !levels || levels.length === 0) {
+        select.innerHTML = '<option value="">No levels found</option>';
         return;
       }
 
-      msgBox.style.color = '#a0a5b5';
-      msgBox.innerText = 'Logging in...';
+      loadedLevels = levels;
+      select.innerHTML = levels.map(lvl => 
+        `<option value="${lvl.id}">#${lvl.rank_position} - ${lvl.name}</option>`
+      ).join('');
+    }
 
-      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    // --- ADD PLAYER RECORD TO EXISTING LEVEL ---
+    async function addRecord() {
+      const levelId = document.getElementById('levelSelect').value;
+      const user = document.getElementById('playerName').value.trim();
+      const percent = parseInt(document.getElementById('playerPercent').value);
+      const video = document.getElementById('playerVideo').value.trim();
+
+      if (!levelId || !user || isNaN(percent)) {
+        alert('Please fill in the player name and percentage.');
+        return;
+      }
+
+      // Find selected level
+      const targetLevel = loadedLevels.find(l => l.id == levelId);
+      if (!targetLevel) return alert('Level not found.');
+
+      // Existing records array or new array
+      const updatedRecords = Array.isArray(targetLevel.records) ? [...targetLevel.records] : [];
+
+      // Add new record object
+      updatedRecords.push({ user, percent, video });
+
+      // Update in Supabase
+      const { error } = await supabaseClient
+        .from('levels')
+        .update({ records: updatedRecords })
+        .eq('id', levelId);
 
       if (error) {
-        console.error("Login Error:", error);
-        msgBox.style.color = '#ff6b6b';
-        msgBox.innerText = error.message;
+        alert('Error adding record: ' + error.message);
       } else {
-        msgBox.style.color = '#2AFA8A';
-        msgBox.innerText = 'Success! Reloading...';
-        setTimeout(() => location.reload(), 500);
+        alert(`Record added for ${user}!`);
+        // Clear inputs
+        document.getElementById('playerName').value = '';
+        document.getElementById('playerVideo').value = '';
+        loadLevelSelectOptions(); // refresh local cache
       }
     }
 
-    async function signup() {
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value.trim();
-      const msgBox = document.getElementById('authMsg');
-
-      if (!email || !password) {
-        msgBox.style.color = '#ff6b6b';
-        msgBox.innerText = 'Please enter both email and password.';
-        return;
-      }
-
-      if (password.length < 6) {
-        msgBox.style.color = '#ff6b6b';
-        msgBox.innerText = 'Password must be at least 6 characters long.';
-        return;
-      }
-
-      msgBox.style.color = '#a0a5b5';
-      msgBox.innerText = 'Creating account...';
-
-      const { data, error } = await supabaseClient.auth.signUp({ email, password });
-
-      if (error) {
-        console.error("Signup Error:", error);
-        msgBox.style.color = '#ff6b6b';
-        msgBox.innerText = error.message;
-      } else {
-        msgBox.style.color = '#2AFA8A';
-        msgBox.innerText = 'Account created! Try logging in now.';
-      }
-    }
-
-    async function logout() {
-      await supabaseClient.auth.signOut();
-      location.reload();
-    }
-
+    // --- ADD NEW LEVEL ---
     async function addLevel() {
       const newLevel = {
         rank_position: parseInt(document.getElementById('rank').value),
@@ -178,6 +182,40 @@
         alert('Level added successfully!');
         location.reload();
       }
+    }
+
+    async function login() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const msgBox = document.getElementById('authMsg');
+
+      const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      if (error) {
+        msgBox.style.color = '#ff6b6b';
+        msgBox.innerText = error.message;
+      } else {
+        location.reload();
+      }
+    }
+
+    async function signup() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const msgBox = document.getElementById('authMsg');
+
+      const { error } = await supabaseClient.auth.signUp({ email, password });
+      if (error) {
+        msgBox.style.color = '#ff6b6b';
+        msgBox.innerText = error.message;
+      } else {
+        msgBox.style.color = '#2AFA8A';
+        msgBox.innerText = 'Account created! Try logging in.';
+      }
+    }
+
+    async function logout() {
+      await supabaseClient.auth.signOut();
+      location.reload();
     }
 
     checkAuth();
