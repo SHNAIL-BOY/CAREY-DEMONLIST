@@ -307,7 +307,7 @@
     // --- 1. SUPABASE CONFIGURATION ---
     const SUPABASE_URL = 'https://eqjykpurejkdvvjnicoq.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxanlrcHVyZWprZHZ2am5pY29xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUyMTk5NTUsImV4cCI6MjEwMDc5NTk1NX0.Zw5PerSoU3yR1EOJoNSEzl_cVNUr4tIgjm2ZPm3gqWY';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // --- 2. LEADERBOARD POPUP INTERACTION ---
     const menuToggle = document.getElementById('menuToggle');
@@ -333,31 +333,32 @@
     }
 
     // --- 4. FETCH DEMON LIST FROM SUPABASE ---
-    async function loadDemonlist() {
-      const listContainer = document.getElementById('demon-list');
+async function loadDemonlist() {
+  const listContainer = document.getElementById('demon-list');
 
-      try {
-        const { data: levels, error } = await supabase
-          .from('levels')
-          .select('*')
-          .order('rank_position', { ascending: true });
+  try {
+    // Note: using supabaseClient here instead of supabase
+    const { data: levels, error } = await supabaseClient
+      .from('levels')
+      .select('*')
+      .order('rank_position', { ascending: true });
 
-        if (error) throw error;
+    if (error) throw error;
 
-        renderLevels(levels);
-        const sortedPlayers = calculateLeaderboard(levels);
-        renderTop10Leaderboard(sortedPlayers);
+    renderLevels(levels);
+    const sortedPlayers = calculateLeaderboard(levels);
+    renderTop10Leaderboard(sortedPlayers);
 
-      } catch (error) {
-        console.error("Error fetching levels:", error);
-        listContainer.innerHTML = `
-          <div style="background: #2a1517; color: #ff6b6b; padding: 20px; border-radius: 8px; text-align: center;">
-            <h3>⚠️ Unable to load Demonlist</h3>
-            <p>${error.message}</p>
-          </div>
-        `;
-      }
-    }
+  } catch (error) {
+    console.error("Error fetching levels:", error);
+    listContainer.innerHTML = `
+      <div style="background: #2a1517; color: #ff6b6b; padding: 20px; border-radius: 8px; text-align: center;">
+        <h3>⚠️ Unable to load Demonlist</h3>
+        <p>${error.message}</p>
+      </div>
+    `;
+  }
+}
 
     // --- 5. RENDER DEMON CARDS ---
     function renderLevels(levels) {
