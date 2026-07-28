@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Carey Demonlist - Portal</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --bg-color: #121318;
+      --card-bg: #1c1e24;
+      --accent-color: #2AFA8A;
+      --border-color: #2e323d;
+      --text-color: #ffffff;
+      --subtext-color: #a0a5b5;
+    }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-color); color: var(--text-color); padding: 20px; display: flex; flex-direction: column; align-items: center; }
+    .card { background: var(--card-bg); padding: 25px; border-radius: 8px; width: 100%; max-width: 420px; border: 1px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+    h2 { color: var(--accent-color); margin-top: 0; }
+    input, button { width: 100%; padding: 12px; margin-top: 10px; border-radius: 6px; border: 1px solid var(--border-color); box-sizing: border-box; }
+    input { background: #2e323d; color: white; }
+    button { background: var(--accent-color); color: black; font-weight: bold; cursor: pointer; border: none; }
+    .btn-secondary { background: transparent; color: var(--accent-color); border: 1px solid var(--accent-color); }
+    .btn-secondary:hover { background: rgba(42, 250, 138, 0.1); }
+    .hidden { display: none; }
+    .msg { margin-top: 10px; font-size: 0.85rem; text-align: center; }
+    .back-link { margin-bottom: 20px; color: var(--subtext-color); text-decoration: none; font-size: 0.9rem; }
+    .back-link:hover { color: var(--accent-color); }
+  </style>
+</head>
+<body>
+
+  <a href="index.html" class="back-link">← Back to Demonlist</a>
+
+  <div class="card" id="authCard">
+    <h2>🔑 Account Portal</h2>
+    <input type="email" id="email" placeholder="Email Address" />
+    <input type="password" id="password" placeholder="Password" />
+    
+    <button onclick="login()">Log In</button>
+    <button onclick="signup()" class="btn-secondary">Create Account</button>
+    
+    <div class="msg" id="authMsg"></div>
+  </div>
+
+  <div class="card hidden" id="dashboardCard">
+    <h2 id="welcomeText">Welcome!</h2>
+    <p id="roleBadge" style="color: var(--subtext-color); font-size: 0.9rem;"></p>
+
+    <div id="adminForm" class="hidden">
+      <hr style="border-color: var(--border-color); margin: 20px 0;" />
+      <h3>➕ Add New Demon</h3>
+      <input type="number" id="rank" placeholder="Rank Position (e.g. 1)" />
+      <input type="text" id="name" placeholder="Level Name" />
+      <input type="text" id="publisher" placeholder="Publisher / Creator" />
+      <input type="text" id="verifier" placeholder="Verifier" />
+      <input type="text" id="levelID" placeholder="Level ID" />
+      <input type="text" id="video" placeholder="YouTube Verification Link" />
+      <button onclick="addLevel()" style="margin-top: 15px;">Save Level</button>
+    </div>
+
+    <button onclick="logout()" class="btn-secondary" style="margin-top: 20px;">Log Out</button>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'YOUR_SUPABASE_URL_HERE';
+    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY_HERE';
+    const ADMIN_USER_ID = 'YOUR-EXACT-USER-ID-HERE';
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function checkAuth() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        document.getElementById('authCard').classList.add('hidden');
+        document.getElementById('dashboardCard').classList.remove('hidden');
+
+        const user = session.user;
+        document.getElementById('welcomeText').innerText = `Logged in as ${user.email}`;
+
+        // Check if user is Admin
+        if (user.id === ADMIN_USER_ID) {
+          document.getElementById('roleBadge').innerText = 'Role: Admin (Full Edit Access)';
+          document.getElementById('adminForm').classList.remove('hidden');
+        } else {
+          document.getElementById('roleBadge').innerText = 'Role: Member (View Only)';
+        }
+      }
+    }
+
+    async function login() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        document.getElementById('authMsg').style.color = '#ff6b6b';
+        document.getElementById('authMsg').innerText = error.message;
+      } else {
+        location.reload();
+      }
+    }
+
+    async function signup() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const { error } = await supabase.auth.signUp({ email, password });
+
+      if (error) {
+        document.getElementById('authMsg').style.color = '#ff6b6b';
+        document.getElementById('authMsg').innerText = error.message;
+      } else {
+        document.getElementById('authMsg').style.color = '#2AFA8A';
+        document.getElementById('authMsg').innerText = 'Account created! Check your email to confirm.';
+      }
+    }
+
+    async function logout() {
+      await supabase.auth.signOut();
+      location.reload();
+    }
+
+    async function addLevel() {
+      const newLevel = {
+        rank_position: parseInt(document.getElementById('rank').value),
+        name: document.getElementById('name').value,
+        publisher: document.getElementById('publisher').value,
+        verifier: document.getElementById('verifier').value,
+        level_id: document.getElementById('levelID').value,
+        video: document.getElementById('video').value,
+        records: []
+      };
+
+      const { error } = await supabase.from('levels').insert([newLevel]);
+
+      if (error) {
+        alert('Error adding level: ' + error.message);
+      } else {
+        alert('Level added successfully!');
+        location.reload();
+      }
+    }
+
+    checkAuth();
+  </script>
+</body>
+</html>
